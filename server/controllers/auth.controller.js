@@ -2,6 +2,7 @@ import User from '../models/user.model'
 import jwt from 'jsonwebtoken'
 import expressJwt from 'express-jwt'
 import config from './../../config/config'
+import handlerControllerError from '../helpers/controllerErrorHandler'
 
 const signin = async (req, res) => {
   try {
@@ -33,11 +34,7 @@ const signin = async (req, res) => {
       user: {_id: user._id, name: user.name, email: user.email}
     })
   } catch (err) {
-    console.log(err)
-    return res.status('401').json({
-      error: "Could not sign in"
-    })
-
+	  return handlerControllerError(res, err, 401, "Could not sign in")
   }
 }
 
