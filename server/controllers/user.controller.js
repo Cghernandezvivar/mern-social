@@ -4,6 +4,7 @@ import errorHandler from './../helpers/dbErrorHandler'
 import formidable from 'formidable'
 import fs from 'fs'
 import profileImage from './../../client/assets/images/profile-pic.png'
+import handlerControllerError from '../helpers/controllerErrorHandler'
 
 const create = async (req, res) => {
   const user = new User(req.body)
@@ -13,9 +14,7 @@ const create = async (req, res) => {
       message: "Successfully signed up!"
     })
   } catch (err) {
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err)
-    })
+	  return handlerControllerError(res, err, 400)
   }
 }
 
@@ -28,15 +27,11 @@ const userByID = async (req, res, next, id) => {
     .populate('followers', '_id name')
     .exec()
     if (!user)
-      return res.status('400').json({
-        error: "User not found"
-      })
+	  return handlerControllerError(res, null, 400, "User not found")
     req.profile = user
     next()
   } catch (err) {
-    return res.status('400').json({
-      error: "Could not retrieve user"
-    })
+	  return handlerControllerError(res, err, 400, " Could not retrieve user")
   }
 }
 
@@ -51,9 +46,7 @@ const list = async (req, res) => {
     let users = await User.find().select('name email updated created')
     res.json(users)
   } catch (err) {
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err)
-    })
+	  return handlerControllerError(res, err, 400)
   }
 }
 
@@ -62,9 +55,7 @@ const update = (req, res) => {
   form.keepExtensions = true
   form.parse(req, async (err, fields, files) => {
     if (err) {
-      return res.status(400).json({
-        error: "Photo could not be uploaded"
-      })
+	    return handlerControllerError(res, err, 400, "Photo could not be uploaded")
     }
     let user = req.profile
     user = extend(user, fields)
@@ -79,9 +70,7 @@ const update = (req, res) => {
       user.salt = undefined
       res.json(user)
     } catch (err) {
-      return res.status(400).json({
-        error: errorHandler.getErrorMessage(err)
-      })
+	    return handlerControllerError(res, err, 400)
     }
   })
 }
@@ -94,9 +83,7 @@ const remove = async (req, res) => {
     deletedUser.salt = undefined
     res.json(deletedUser)
   } catch (err) {
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err)
-    })
+	  return handlerControllerError(res, err, 400)
   }
 }
 
@@ -117,9 +104,7 @@ const addFollowing = async (req, res, next) => {
     await User.findByIdAndUpdate(req.body.userId, {$push: {following: req.body.followId}}) 
     next()
   }catch(err){
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err)
-    })
+	  return handlerControllerError(res, err, 400)
   }
 }
 
@@ -133,10 +118,8 @@ const addFollower = async (req, res) => {
       result.salt = undefined
       res.json(result)
     }catch(err) {
-      return res.status(400).json({
-        error: errorHandler.getErrorMessage(err)
-      })
-    }  
+	    return handlerControllerError(res, err, 400)
+    }
 }
 
 const removeFollowing = async (req, res, next) => {
@@ -144,9 +127,7 @@ const removeFollowing = async (req, res, next) => {
     await User.findByIdAndUpdate(req.body.userId, {$pull: {following: req.body.unfollowId}}) 
     next()
   }catch(err) {
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err)
-    })
+	  return handlerControllerError(res, err, 400)
   }
 }
 const removeFollower = async (req, res) => {
@@ -159,9 +140,7 @@ const removeFollower = async (req, res) => {
     result.salt = undefined
     res.json(result)
   }catch(err){
-      return res.status(400).json({
-        error: errorHandler.getErrorMessage(err)
-      })
+	  return handlerControllerError(res, err, 400)
   }
 }
 
@@ -172,9 +151,7 @@ const findPeople = async (req, res) => {
     let users = await User.find({ _id: { $nin : following } }).select('name')
     res.json(users)
   }catch(err){
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err)
-    })
+	  return handlerControllerError(res, err, 400)
   }
 }
 

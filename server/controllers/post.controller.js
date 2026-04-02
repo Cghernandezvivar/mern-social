@@ -1,16 +1,14 @@
 import Post from '../models/post.model'
-import errorHandler from './../helpers/dbErrorHandler'
 import formidable from 'formidable'
 import fs from 'fs'
+import handlerControllerError from '../helpers/controllerErrorHandler'
 
 const create = (req, res, next) => {
   let form = new formidable.IncomingForm()
   form.keepExtensions = true
   form.parse(req, async (err, fields, files) => {
     if (err) {
-      return res.status(400).json({
-        error: "Image could not be uploaded"
-      })
+	    return handlerControllerError(res, err, 400, "Image could not be uploaded")
     }
     let post = new Post(fields)
     post.postedBy= req.profile
@@ -22,9 +20,7 @@ const create = (req, res, next) => {
       let result = await post.save()
       res.json(result)
     }catch (err){
-      return res.status(400).json({
-        error: errorHandler.getErrorMessage(err)
-      })
+	    return handlerControllerError(res, err, 400)
     }
   })
 }
@@ -33,15 +29,11 @@ const postByID = async (req, res, next, id) => {
   try{
     let post = await Post.findById(id).populate('postedBy', '_id name').exec()
     if (!post)
-      return res.status('400').json({
-        error: "Post not found"
-      })
+	  return handlerControllerError(res, null, 400, "Post not found")
     req.post = post
     next()
   }catch(err){
-    return res.status('400').json({
-      error: "Could not retrieve use post"
-    })
+	  return handlerControllerError(res, err, 400, "Could not retrieve use post")
   }
 }
 
@@ -54,9 +46,7 @@ const listByUser = async (req, res) => {
                           .exec()
     res.json(posts)
   }catch(err){
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err)
-    })
+	  return handlerControllerError(res, err, 400)
   }
 }
 
@@ -71,9 +61,7 @@ const listNewsFeed = async (req, res) => {
                           .exec()
     res.json(posts)
   }catch(err){
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err)
-    })
+	  return handlerControllerError(res, err, 400)
   }
 }
 
@@ -83,9 +71,7 @@ const remove = async (req, res) => {
     let deletedPost = await post.remove()
     res.json(deletedPost)
   }catch(err){
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err)
-    })
+	  return handlerControllerError(res, err, 400)
   }
 }
 
@@ -99,9 +85,7 @@ const like = async (req, res) => {
     let result = await Post.findByIdAndUpdate(req.body.postId, {$push: {likes: req.body.userId}}, {new: true})
     res.json(result)
   }catch(err){
-      return res.status(400).json({
-        error: errorHandler.getErrorMessage(err)
-      })
+	  return handlerControllerError(res, err, 400)
   }
 }
 
@@ -110,9 +94,7 @@ const unlike = async (req, res) => {
     let result = await Post.findByIdAndUpdate(req.body.postId, {$pull: {likes: req.body.userId}}, {new: true})
     res.json(result)
   }catch(err){
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err)
-    })
+	  return handlerControllerError(res, err, 400)
   }
 }
 
@@ -126,9 +108,7 @@ const comment = async (req, res) => {
                             .exec()
     res.json(result)
   }catch(err){
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err)
-    })
+	  return handlerControllerError(res, err, 400)
   }
 }
 const uncomment = async (req, res) => {
@@ -140,18 +120,14 @@ const uncomment = async (req, res) => {
                           .exec()
     res.json(result)
   }catch(err){
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err)
-    })
+	  return handlerControllerError(res, err, 400)
   }
 }
 
 const isPoster = (req, res, next) => {
   let isPoster = req.post && req.auth && req.post.postedBy._id == req.auth._id
   if(!isPoster){
-    return res.status('403').json({
-      error: "User is not authorized"
-    })
+	  return handlerControllerError(res, null, 403, "User is not authorized")
   }
   next()
 }
