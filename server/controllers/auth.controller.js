@@ -4,6 +4,8 @@ import expressJwt from 'express-jwt'
 import config from './../../config/config'
 import handlerControllerError from '../helpers/controllerErrorHandler'
 
+const COOKIE_EXPIRY_OFFSET_MS = 9999
+
 const signin = async (req, res) => {
   try {
     let user = await User.findOne({
@@ -26,7 +28,7 @@ const signin = async (req, res) => {
     }, config.jwtSecret)
 
     res.cookie("t", token, {
-      expire: new Date() + 9999
+	    expire: new Date( Date.now() + COOKIE_EXPIRY_OFFSET_MS)
     })
 
     return res.json({
