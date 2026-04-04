@@ -13,8 +13,8 @@ const create = (req, res, next) => {
     let post = new Post(fields)
     post.postedBy= req.profile
     if(files.photo){
-      post.photo.data = fs.readFileSync(files.photo.path)
-      post.photo.contentType = files.photo.type
+	    post.photo.data = await fs.promises.readFile(files.photo.path)
+      	    post.photo.contentType = files.photo.type
     }
     try {
       let result = await post.save()
