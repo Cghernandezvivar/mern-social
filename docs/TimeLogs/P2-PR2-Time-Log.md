@@ -1,4 +1,4 @@
-# P2 PR 2 Time Log: 
+# P2 PR 2 Time Log:
 - Triage/Understand: 0:05
 - Plan: 0:06
 - Implement: 0:10 
