@@ -5,6 +5,7 @@ import formidable from 'formidable'
 import fs from 'fs'
 import profileImage from './../../client/assets/images/profile-pic.png'
 import handlerControllerError from '../helpers/controllerErrorHandler'
+import followService from '../services/follow.service'
 
 const create = async (req, res) => {
   const user = new User(req.body)
@@ -99,7 +100,7 @@ const defaultPhoto = (req, res) => {
   return res.sendFile(process.cwd()+profileImage)
 }
 
-const addFollowing = async (req, res, next) => {
+/*const addFollowing = async (req, res, next) => {
   try{
     await User.findByIdAndUpdate(req.body.userId, {$push: {following: req.body.followId}}) 
     next()
@@ -130,6 +131,7 @@ const removeFollowing = async (req, res, next) => {
 	  return handlerControllerError(res, err, 400)
   }
 }
+
 const removeFollower = async (req, res) => {
   try{
     let result = await User.findByIdAndUpdate(req.body.unfollowId, {$pull: {followers: req.body.userId}}, {new: true})
@@ -142,6 +144,25 @@ const removeFollower = async (req, res) => {
   }catch(err){
 	  return handlerControllerError(res, err, 400)
   }
+}
+*/
+
+const follow = async (req, res) => {
+    try {
+        const result = await followService.follow(req.body.userId, req.body.followId)
+        res.json(result)
+    } catch (err) {
+        return handlerControllerError(res, err, 400)
+    }
+}
+
+const unfollow = async (req, res) => {
+    try {
+        const result = await followService.unfollow(req.body.userId, req.body.unfollowId)
+        res.json(result)
+    } catch (err) {
+        return handlerControllerError(res, err, 400)
+    }
 }
 
 const findPeople = async (req, res) => {
@@ -164,9 +185,11 @@ export default {
   update,
   photo,
   defaultPhoto,
-  addFollowing,
+ /* addFollowing,
   addFollower,
   removeFollowing,
-  removeFollower,
+  removeFollower,*/
+  follow,
+  unfollow,
   findPeople
 }
