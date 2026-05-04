@@ -1,11 +1,12 @@
 import User from '../models/user.model'
 import extend from 'lodash/extend'
 import errorHandler from './../helpers/dbErrorHandler'
-import formidable from 'formidable'
+//import formidable from 'formidable'
 import fs from 'fs'
 import profileImage from './../../client/assets/images/profile-pic.png'
 import handlerControllerError from '../helpers/controllerErrorHandler'
 import followService from '../services/follow.service'
+import uploadService from '../services/upload.service'
 
 const create = async (req, res) => {
   const user = new User(req.body)
@@ -51,6 +52,7 @@ const list = async (req, res) => {
   }
 }
 
+/*
 const update = (req, res) => {
   let form = new formidable.IncomingForm()
   form.keepExtensions = true
@@ -74,6 +76,30 @@ const update = (req, res) => {
 	    return handlerControllerError(res, err, 400)
     }
   })
+}
+*/
+
+const update = async (req, res) => {
+    try {
+        const { fields, files } = await uploadService.parseMultipartForm(
+        req,
+        'Photo could not be uploaded'
+        )
+        let user = req.profile
+        user = extend(user, fields)
+        user.updated = Date.now()
+
+        if (files.photo) {
+            user.photo.data = fs.readFileSync(files.photo.path)
+            user.photo.contentType = files.photo.type
+        }
+        await user.save()
+        user.hashed_password = undefined
+        user.salt = undefined
+        res.json(user)
+    } catch (err) {
+        return handlerControllerError(res, err.error || err, err.status || 400, err.message)
+    }
 }
 
 const remove = async (req, res) => {
