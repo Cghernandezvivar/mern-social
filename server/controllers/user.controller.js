@@ -1,7 +1,6 @@
 import User from '../models/user.model'
 import extend from 'lodash/extend'
 import errorHandler from './../helpers/dbErrorHandler'
-//import formidable from 'formidable'
 import fs from 'fs'
 import profileImage from './../../client/assets/images/profile-pic.png'
 import handlerControllerError from '../helpers/controllerErrorHandler'
@@ -52,33 +51,6 @@ const list = async (req, res) => {
   }
 }
 
-/*
-const update = (req, res) => {
-  let form = new formidable.IncomingForm()
-  form.keepExtensions = true
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-	    return handlerControllerError(res, err, 400, "Photo could not be uploaded")
-    }
-    let user = req.profile
-    user = extend(user, fields)
-    user.updated = Date.now()
-    if(files.photo){
-      user.photo.data = fs.readFileSync(files.photo.path)
-      user.photo.contentType = files.photo.type
-    }
-    try {
-      await user.save()
-      user.hashed_password = undefined
-      user.salt = undefined
-      res.json(user)
-    } catch (err) {
-	    return handlerControllerError(res, err, 400)
-    }
-  })
-}
-*/
-
 const update = async (req, res) => {
     try {
         const { fields, files } = await uploadService.parseMultipartForm(
@@ -126,53 +98,6 @@ const defaultPhoto = (req, res) => {
   return res.sendFile(process.cwd()+profileImage)
 }
 
-/*const addFollowing = async (req, res, next) => {
-  try{
-    await User.findByIdAndUpdate(req.body.userId, {$push: {following: req.body.followId}}) 
-    next()
-  }catch(err){
-	  return handlerControllerError(res, err, 400)
-  }
-}
-
-const addFollower = async (req, res) => {
-  try{
-    let result = await User.findByIdAndUpdate(req.body.followId, {$push: {followers: req.body.userId}}, {new: true})
-                            .populate('following', '_id name')
-                            .populate('followers', '_id name')
-                            .exec()
-      result.hashed_password = undefined
-      result.salt = undefined
-      res.json(result)
-    }catch(err) {
-	    return handlerControllerError(res, err, 400)
-    }
-}
-
-const removeFollowing = async (req, res, next) => {
-  try{
-    await User.findByIdAndUpdate(req.body.userId, {$pull: {following: req.body.unfollowId}}) 
-    next()
-  }catch(err) {
-	  return handlerControllerError(res, err, 400)
-  }
-}
-
-const removeFollower = async (req, res) => {
-  try{
-    let result = await User.findByIdAndUpdate(req.body.unfollowId, {$pull: {followers: req.body.userId}}, {new: true})
-                            .populate('following', '_id name')
-                            .populate('followers', '_id name')
-                            .exec() 
-    result.hashed_password = undefined
-    result.salt = undefined
-    res.json(result)
-  }catch(err){
-	  return handlerControllerError(res, err, 400)
-  }
-}
-*/
-
 const follow = async (req, res) => {
     try {
         const result = await followService.follow(req.body.userId, req.body.followId)
@@ -211,10 +136,6 @@ export default {
   update,
   photo,
   defaultPhoto,
- /* addFollowing,
-  addFollower,
-  removeFollowing,
-  removeFollower,*/
   follow,
   unfollow,
   findPeople
