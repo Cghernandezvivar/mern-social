@@ -1,9 +1,10 @@
 import Post from '../models/post.model'
-import formidable from 'formidable'
-import fs from 'fs'
+import postService from '../services/post.service'
+//import formidable from 'formidable'
+//import fs from 'fs'
 import handlerControllerError from '../helpers/controllerErrorHandler'
 
-const create = (req, res, next) => {
+/*const create = (req, res, next) => {
   let form = new formidable.IncomingForm()
   form.keepExtensions = true
   form.parse(req, async (err, fields, files) => {
@@ -23,6 +24,14 @@ const create = (req, res, next) => {
 	    return handlerControllerError(res, err, 400)
     }
   })
+}*/
+const create = async (req, res) => {
+    try {
+        const result = await postService.createPost(req)
+        res.json(result)
+    } catch ({ error, status, message }) {
+        return handlerControllerError(res, error, status, message)
+    }
 }
 
 const postByID = async (req, res, next, id) => {
@@ -65,7 +74,7 @@ const listNewsFeed = async (req, res) => {
   }
 }
 
-const remove = async (req, res) => {
+/*const remove = async (req, res) => {
   let post = req.post
   try{
     let deletedPost = await post.remove()
@@ -73,6 +82,14 @@ const remove = async (req, res) => {
   }catch(err){
 	  return handlerControllerError(res, err, 400)
   }
+}*/
+const remove = async (req, res) => {
+    try {
+        const deletedPost = await postService.removePost(req.post)
+        res.json(deletedPost)
+    } catch ({ error, status, message }) {
+        return handlerControllerError(res, error, status, message)
+    }
 }
 
 const photo = (req, res, next) => {
