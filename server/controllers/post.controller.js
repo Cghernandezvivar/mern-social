@@ -1,30 +1,7 @@
 import Post from '../models/post.model'
 import postService from '../services/post.service'
-//import formidable from 'formidable'
-//import fs from 'fs'
 import handlerControllerError from '../helpers/controllerErrorHandler'
 
-/*const create = (req, res, next) => {
-  let form = new formidable.IncomingForm()
-  form.keepExtensions = true
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-	    return handlerControllerError(res, err, 400, "Image could not be uploaded")
-    }
-    let post = new Post(fields)
-    post.postedBy= req.profile
-    if(files.photo){
-	    post.photo.data = await fs.promises.readFile(files.photo.path)
-      	    post.photo.contentType = files.photo.type
-    }
-    try {
-      let result = await post.save()
-      res.json(result)
-    }catch (err){
-	    return handlerControllerError(res, err, 400)
-    }
-  })
-}*/
 const create = async (req, res) => {
     try {
         const result = await postService.createPost(req)
@@ -74,15 +51,6 @@ const listNewsFeed = async (req, res) => {
   }
 }
 
-/*const remove = async (req, res) => {
-  let post = req.post
-  try{
-    let deletedPost = await post.remove()
-    res.json(deletedPost)
-  }catch(err){
-	  return handlerControllerError(res, err, 400)
-  }
-}*/
 const remove = async (req, res) => {
     try {
         const deletedPost = await postService.removePost(req.post)
