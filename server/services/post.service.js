@@ -4,7 +4,7 @@ import fs from 'fs'
 
 const createPost = async (req) => {
     try {
-        const { fields, file } = await uploadService.parseMultipartForm(
+        const { fields, files } = await uploadService.parseMultipartForm(
         req,
         'Image could not be uploaded'
     )
